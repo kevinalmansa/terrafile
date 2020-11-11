@@ -3,10 +3,10 @@ package module
 //TerraformModule is an implimentation of Module for Terraform Modules hosted in
 //git repos
 type TerraformModule struct {
-	repo   string `yaml:"repo,omitempty"`
-	branch string `yaml:"branch,omitempty"`
-	tag    string `yaml:"tag,omitempty"`
-	path   string `yaml:"path,omitempty"`
+	Repo   string `yaml:"repo,omitempty"`
+	Branch string `yaml:"branch,omitempty"`
+	Tag    string `yaml:"tag,omitempty"`
+	Path   string `yaml:"path,omitempty"`
 }
 
 //Clone will clone the module and checkout the specified branch/tag

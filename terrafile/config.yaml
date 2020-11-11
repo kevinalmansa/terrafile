@@ -1,0 +1,11 @@
+CacheDir: "./modules"
+Branch: "main"
+modules:
+  vpc:
+    repo:  "git@github.com:kevinalmansa/aws-vpc"
+    tag: "v1.0.1"
+
+  iam_role:
+    repo:  "git@github.com:kevinalmansa/modules"
+    branch: "dev"
+    path: "data/security_groups"
