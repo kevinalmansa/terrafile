@@ -35,9 +35,13 @@ func (c *LocalModuleCache) Create() error {
 
 		configureModule(c.configuration, &module)
 		if _, err := os.Stat(modLocation); os.IsNotExist(err) {
-			module.Clone(modLocation)
+			if err = module.Clone(modLocation); err != nil {
+				log.Printf("Error cloning module: %s", err)
+			}
 		} else {
-			module.Update(modLocation)
+			if err = module.Update(modLocation); err != nil {
+				log.Printf("Error updating module: %s", err)
+			}
 		}
 	}
 	return nil
