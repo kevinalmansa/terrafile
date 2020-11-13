@@ -60,6 +60,7 @@ func initConfig() {
 	// Set default values
 	viper.SetDefault("CacheDir", "modules")
 	viper.SetDefault("Branch", "main")
+	viper.SetDefault("Tag", "")
 
 	if cfgFile != "" {
 		// Use config file from the flag.
