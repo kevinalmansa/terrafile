@@ -6,14 +6,15 @@ import (
 	"os"
 	"path"
 
-	"github.com/kevinalmansa/terrafile/cmd/terrafile"
+	terrafile "github.com/kevinalmansa/terrafile/pkg/config"
 	"github.com/kevinalmansa/terrafile/pkg/module"
 )
 
 //LocalModuleCache is an implimentation of the Module interface for creating a
 //local cache to store modules.
 type LocalModuleCache struct {
-	configuration *terrafile.Config
+	//Configuration to use by the cache
+	Configuration *terrafile.Config
 }
 
 func configureModule(configuration *terrafile.Config, module *module.TerraformModule) {
@@ -27,13 +28,13 @@ func configureModule(configuration *terrafile.Config, module *module.TerraformMo
 
 //Create all modules, storing them in the cache
 func (c *LocalModuleCache) Create() error {
-	if c.configuration == nil {
+	if c.Configuration == nil {
 		return &InitError{}
 	}
-	for name, module := range c.configuration.Modules {
-		modLocation := path.Join(c.configuration.CacheDir, name)
+	for name, module := range c.Configuration.Modules {
+		modLocation := path.Join(c.Configuration.CacheDir, name)
 
-		configureModule(c.configuration, &module)
+		configureModule(c.Configuration, &module)
 		if _, err := os.Stat(modLocation); os.IsNotExist(err) {
 			if err = module.Clone(modLocation); err != nil {
 				log.Printf("Error cloning module: %s", err)
@@ -49,15 +50,16 @@ func (c *LocalModuleCache) Create() error {
 
 //Delete cache
 func (c *LocalModuleCache) Delete(deleteAll bool) error {
-	files, err := ioutil.ReadDir(c.configuration.CacheDir)
+	files, err := ioutil.ReadDir(c.Configuration.CacheDir)
 	if err != nil {
 		return err
 	}
 
 	for _, f := range files {
 		if f.IsDir() {
-			if _, ok := c.configuration.Modules[f.Name()]; deleteAll || ok {
-				err := os.RemoveAll(f.Name())
+			if _, ok := c.Configuration.Modules[f.Name()]; deleteAll || ok {
+				modulePath := path.Join(c.Configuration.CacheDir, f.Name())
+				err := os.RemoveAll(modulePath)
 				if err != nil {
 					log.Printf("Error removing cached directory: %s", err)
 				}

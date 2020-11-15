@@ -7,11 +7,14 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/kevinalmansa/terrafile/pkg/cache"
+	terrafile "github.com/kevinalmansa/terrafile/pkg/config"
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
-var configuration Config
+var configuration terrafile.Config
+var terraCache cache.Cache
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -80,4 +83,5 @@ func initConfig() {
 	if err != nil {
 		log.Fatalf("Error decoding config file: %s", err)
 	}
+	terraCache = &cache.LocalModuleCache{Configuration: &configuration}
 }

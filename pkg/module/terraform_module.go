@@ -2,6 +2,7 @@ package module
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/go-git/go-git/v5"
@@ -17,13 +18,35 @@ type TerraformModule struct {
 	Path   string `yaml:"path,omitempty"`
 }
 
+func (m *TerraformModule) checkoutTag(repo *git.Repository) error {
+	ref, err := repo.Tag(m.Tag)
+	if err != nil {
+		return err
+	}
+	w, err := repo.Worktree()
+	if err != nil {
+		return err
+	}
+	err = w.Checkout(&git.CheckoutOptions{
+		Hash: ref.Hash(),
+	})
+	return err
+}
+
 //Clone will clone the module and checkout the specified branch/tag
 func (m *TerraformModule) Clone(cachePath string) error {
-	_, err := git.PlainClone(cachePath, false, &git.CloneOptions{
+	log.Printf("Downloading %s to %s...", m.Repo, cachePath)
+	repo, err := git.PlainClone(cachePath, false, &git.CloneOptions{
 		URL:           m.Repo,
 		Progress:      os.Stdout,
 		ReferenceName: plumbing.ReferenceName(fmt.Sprintf("refs/heads/%s", m.Branch)),
 	})
+	if err != nil {
+		return err
+	}
+	if m.Tag != "" {
+		err = m.checkoutTag(repo)
+	}
 	return err
 }
 
@@ -38,5 +61,8 @@ func (m *TerraformModule) Update(cachePath string) error {
 		return err
 	}
 	err = w.Pull(&git.PullOptions{RemoteName: "origin"})
+	if m.Tag != "" {
+		err = m.checkoutTag(repo)
+	}
 	return err
 }

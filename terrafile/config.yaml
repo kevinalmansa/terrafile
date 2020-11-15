@@ -2,10 +2,10 @@ CacheDir: "./modules"
 Branch: "main"
 modules:
   vpc:
-    repo:  "git@github.com:kevinalmansa/aws-vpc"
+    repo:  "git@github.com:kevinalmansa/terrafile"
     tag: "v1.0.1"
 
   iam_role:
-    repo:  "git@github.com:kevinalmansa/modules"
+    repo:  "git@github.com:kevinalmansa/container-scanner"
     branch: "dev"
-    path: "data/security_groups"
+

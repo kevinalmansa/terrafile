@@ -1,7 +1,7 @@
 package terrafile
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -13,7 +13,9 @@ var deleteCmd = &cobra.Command{
 	Long: `Delete cached modules. By default will remove modules not present
 in configuration file.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("delete called")
+		log.Println("Deleting modules...")
+		deleteAll, _ := cmd.Flags().GetBool("all")
+		terraCache.Delete(deleteAll)
 	},
 }
 

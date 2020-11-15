@@ -1,7 +1,7 @@
 package terrafile
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -13,7 +13,12 @@ var installCmd = &cobra.Command{
 	Long: `Install and or update modules defined in config file. Any missing
 modules will be downloaded, but previously cached modules will not be removed.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("install called")
+		log.Println("Installing modules...")
+		if err := terraCache.Create(); err != nil {
+			log.Printf("Error installing modules: %s", err)
+		} else {
+			log.Printf("Modules successfully installed.")
+		}
 	},
 }
 
