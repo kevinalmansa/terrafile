@@ -1,4 +1,4 @@
-# terrafile
+# Terrafile
 
 [Terrafile](https://bensnape.com/2016/01/14/terraform-design-patterns-the-terrafile/) implementation in Golang for use with modular trunk-based git workflows.
 
@@ -31,31 +31,40 @@ Use "terrafile [command] --help" for more information about a command.
 ## Example File
 
 ```yaml
-cacheDir: "./modules"
-branch: "main"
+CacheDir: "./modules"
+Branch: "main"
 modules:
   vpc:
-    repo:  "git@github.com:kevinalmansa/aws-vpc"
-    tag: "v1.0.1"
+    repo:  "git@github.com:kevinalmansa/terrafile"
+    tag: "v0.0.1"
 
   iam_role:
-    repo:  "git@github.com:kevinalmansa/modules"
-    branch: "dev"
-    path: "data/security_groups"
-
+    repo:  "git@github.com:kevinalmansa/vagrant-kubernetes"
+    branch: "k8s-tooling"
 ```
 
-Overrides can be specified for each module as seen above, such as branch, tag, repo, or path. This can
+Overrides can be specified for each module as seen above, such as branch, tag or repo. This can
 be used to "fix" specific modules to specific versions.
 
-## Build binary
+## Install
+
+From within this directory, run:
+```
+go install ./
+```
+
+The binary will be installed to your GOPATH/bin directory.
+
+## Build
 
 ```
-go build -o terrafile
+go build -o terrafile.bin ./main.go
 ```
+
+
 
 ## Dependencies
 
-https://github.com/go-git/go-git for git operations
-
-https://github.com/spf13/viper for configuration
+- https://github.com/go-git/go-git for git operations
+- https://github.com/spf13/viper for configuration
+- https://github.com/spf13/cobra for the CLI
