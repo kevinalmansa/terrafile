@@ -1,0 +1,10 @@
+CacheDir: "./modules"
+Branch: "main"
+modules:
+  vpc:
+    repo:  "git@github.com:kevinalmansa/terrafile"
+    tag: "v0.0.1"
+
+  iam_role:
+    repo:  "git@github.com:kevinalmansa/vagrant-kubernetes"
+    branch: "k8s-tooling"
