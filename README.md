@@ -61,8 +61,6 @@ The binary will be installed to your GOPATH/bin directory.
 go build -o terrafile.bin ./main.go
 ```
 
-
-
 ## Dependencies
 
 - https://github.com/go-git/go-git for git operations
