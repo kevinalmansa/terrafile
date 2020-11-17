@@ -58,7 +58,7 @@ The binary will be installed to your GOPATH/bin directory.
 ## Build
 
 ```
-go build -o terrafile.bin ./main.go
+go build -o terrafile ./main.go
 ```
 
 ## Dependencies
