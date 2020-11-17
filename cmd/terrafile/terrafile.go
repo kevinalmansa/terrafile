@@ -45,7 +45,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
-		"config file (default is ./terrafile/config.yaml)")
+		"config file (default is ./terrafile.yaml)")
 	rootCmd.PersistentFlags().StringVar(&configuration.CacheDir, "cache", "modules",
 		"cache directory (default is ./terrafile/modules)")
 	rootCmd.PersistentFlags().StringVar(&configuration.Branch, "branch", "master",
@@ -69,8 +69,8 @@ func initConfig() {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		viper.AddConfigPath("./terrafile/")
-		viper.SetConfigName("config")
+		viper.AddConfigPath("./")
+		viper.SetConfigName("terrafile")
 	}
 	viper.SetConfigType("yaml")
 	viper.AutomaticEnv() // read in environment variables that match
