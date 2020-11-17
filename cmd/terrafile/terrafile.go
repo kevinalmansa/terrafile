@@ -46,9 +46,9 @@ func init() {
 	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
 		"config file (default is ./terrafile/config.yaml)")
-	rootCmd.PersistentFlags().StringVar(&configuration.CacheDir, "cache", "",
+	rootCmd.PersistentFlags().StringVar(&configuration.CacheDir, "cache", "modules",
 		"cache directory (default is ./terrafile/modules)")
-	rootCmd.PersistentFlags().StringVar(&configuration.Branch, "branch", "",
+	rootCmd.PersistentFlags().StringVar(&configuration.Branch, "branch", "master",
 		"branch to checkout for modules (default is main)")
 	rootCmd.PersistentFlags().StringVar(&configuration.Tag, "tag", "",
 		"tag to checkout for modules (default is unset - overrides branch)")
@@ -60,10 +60,10 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	// Set default values
-	viper.SetDefault("CacheDir", "modules")
-	viper.SetDefault("Branch", "main")
-	viper.SetDefault("Tag", "")
+	//Set Viper flags from Cobra
+	viper.Set("Cache", configuration.CacheDir)
+	viper.Set("Branch", configuration.Branch)
+	viper.Set("Tag", configuration.Tag)
 
 	if cfgFile != "" {
 		// Use config file from the flag.

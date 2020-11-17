@@ -59,6 +59,7 @@ func (c *LocalModuleCache) Delete(deleteAll bool) error {
 		if f.IsDir() {
 			if _, ok := c.Configuration.Modules[f.Name()]; deleteAll || ok {
 				modulePath := path.Join(c.Configuration.CacheDir, f.Name())
+				log.Printf("Removing module %s ...", modulePath)
 				err := os.RemoveAll(modulePath)
 				if err != nil {
 					log.Printf("Error removing cached directory: %s", err)
