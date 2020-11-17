@@ -17,3 +17,6 @@
 # VSCode
 *.code-workspace
 .vscode
+
+# terrafile
+modules/

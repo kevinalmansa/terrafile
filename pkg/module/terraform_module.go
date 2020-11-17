@@ -1,6 +1,7 @@
 package module
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -60,8 +61,17 @@ func (m *TerraformModule) Update(cachePath string) error {
 	if err != nil {
 		return err
 	}
+	err = w.Checkout(&git.CheckoutOptions{
+		Branch: plumbing.ReferenceName(fmt.Sprintf("refs/heads/%s", m.Branch)),
+	})
+	if err != nil {
+		log.Printf("Error checking out branch: %s", err)
+	}
 	err = w.Pull(&git.PullOptions{RemoteName: "origin"})
-	if m.Tag != "" {
+	if err != nil && errors.Is(err, git.NoErrAlreadyUpToDate) {
+		err = nil //ignore already up to date "error"
+	}
+	if err == nil && m.Tag != "" {
 		err = m.checkoutTag(repo)
 	}
 	return err

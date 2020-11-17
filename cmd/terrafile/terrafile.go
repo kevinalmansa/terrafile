@@ -12,7 +12,14 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+type terrafileFlags struct {
+	cfgFile  string
+	cacheDir string
+	branch   string
+	tag      string
+}
+
+var cmdFlags terrafileFlags
 var configuration terrafile.Config
 var terraCache cache.Cache
 
@@ -44,13 +51,13 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
+	rootCmd.PersistentFlags().StringVar(&cmdFlags.cfgFile, "config", "",
 		"config file (default is ./terrafile.yaml)")
-	rootCmd.PersistentFlags().StringVar(&configuration.CacheDir, "cache", "modules",
-		"cache directory (default is ./terrafile/modules)")
-	rootCmd.PersistentFlags().StringVar(&configuration.Branch, "branch", "master",
+	rootCmd.PersistentFlags().StringVar(&cmdFlags.cacheDir, "cache", "",
+		"cache directory (default is ./modules)")
+	rootCmd.PersistentFlags().StringVar(&cmdFlags.branch, "branch", "",
 		"branch to checkout for modules (default is main)")
-	rootCmd.PersistentFlags().StringVar(&configuration.Tag, "tag", "",
+	rootCmd.PersistentFlags().StringVar(&cmdFlags.tag, "tag", "",
 		"tag to checkout for modules (default is unset - overrides branch)")
 
 	// Cobra also supports local flags, which will only run
@@ -60,14 +67,15 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	//Set Viper flags from Cobra
-	viper.Set("Cache", configuration.CacheDir)
-	viper.Set("Branch", configuration.Branch)
-	viper.Set("Tag", configuration.Tag)
+	//Set defaults
+	viper.SetDefault("Cache", "./modules")
+	viper.SetDefault("Branch", "master")
+	viper.SetDefault("Tag", "")
 
-	if cfgFile != "" {
+	//Config file
+	if cmdFlags.cfgFile != "" {
 		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
+		viper.SetConfigFile(cmdFlags.cfgFile)
 	} else {
 		viper.AddConfigPath("./")
 		viper.SetConfigName("terrafile")
@@ -83,5 +91,18 @@ func initConfig() {
 	if err != nil {
 		log.Fatalf("Error decoding config file: %s", err)
 	}
+
+	//Set command flag overrides
+	if cmdFlags.cacheDir != "" {
+		configuration.CacheDir = cmdFlags.cacheDir
+	}
+	if cmdFlags.branch != "" {
+		configuration.Branch = cmdFlags.branch
+	}
+	if cmdFlags.tag != "" {
+		configuration.Tag = cmdFlags.tag
+	}
+
+	//initiate cache
 	terraCache = &cache.LocalModuleCache{Configuration: &configuration}
 }
