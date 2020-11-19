@@ -2,7 +2,6 @@ package module
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"os"
 
@@ -41,7 +40,7 @@ func (m *TerraformModule) Clone(cachePath string) error {
 	repo, err := git.PlainClone(cachePath, false, &git.CloneOptions{
 		URL:           m.Repo,
 		Progress:      os.Stdout,
-		ReferenceName: plumbing.ReferenceName(fmt.Sprintf("refs/heads/%s", m.Branch)),
+		ReferenceName: plumbing.NewBranchReferenceName(m.Branch),
 	})
 	if err != nil {
 		return err
@@ -54,7 +53,7 @@ func (m *TerraformModule) Clone(cachePath string) error {
 
 //Update will update the local cache with the latest changes for the module branch/tag
 func (m *TerraformModule) Update(cachePath string) error {
-	targetBranch := plumbing.ReferenceName(fmt.Sprintf("refs/heads/%s", m.Branch))
+	targetBranch := plumbing.NewBranchReferenceName(m.Branch)
 
 	repo, err := git.PlainOpenWithOptions(cachePath, &git.PlainOpenOptions{DetectDotGit: true})
 	if err != nil {
@@ -98,7 +97,10 @@ func (m *TerraformModule) Update(cachePath string) error {
 	}
 
 	//Pull latest updates
-	err = w.Pull(&git.PullOptions{RemoteName: "origin"})
+	err = w.Pull(&git.PullOptions{
+		RemoteName:    "origin",
+		ReferenceName: targetBranch,
+	})
 	if err != nil && errors.Is(err, git.NoErrAlreadyUpToDate) {
 		log.Printf("Module %s already up-to-date", cachePath)
 		err = nil //ignore already up to date "error"
