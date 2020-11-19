@@ -66,3 +66,26 @@ go build -o terrafile ./main.go
 - https://github.com/go-git/go-git for git operations
 - https://github.com/spf13/viper for configuration
 - https://github.com/spf13/cobra for the CLI
+
+## FAQ
+
+### Flag Order
+
+In order of priority (highest to lowest):
+1. Module specific flag specified in config file (branch or tag)
+2. Command paramaters (--branch, --tag, etc)
+3. Global value set in config file ("Branch", "Tag")
+4. Default values
+
+### How to use with private repos?
+
+Authentication is not managed by this application - if you require authentication
+for accessing private repos, please use SSH authentication with your git repo.
+
+The SSH Agent running on your machine will then handle the authentication.
+
+```sh
+$ eval "$(ssh-agent -s)" # start the ssh agent if not already running
+$ ssh-add ~/.ssh/id_rsa # example key name
+$ terrafile install # use terrafile
+```
