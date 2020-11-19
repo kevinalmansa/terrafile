@@ -40,6 +40,7 @@ func (c *LocalModuleCache) Create() error {
 				log.Printf("Error cloning module: %s", err)
 			}
 		} else {
+			log.Printf("Updating module at %s", modLocation)
 			if err = module.Update(modLocation); err != nil {
 				log.Printf("Error updating module: %s", err)
 			}

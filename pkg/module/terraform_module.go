@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
 )
 
@@ -53,24 +54,60 @@ func (m *TerraformModule) Clone(cachePath string) error {
 
 //Update will update the local cache with the latest changes for the module branch/tag
 func (m *TerraformModule) Update(cachePath string) error {
-	repo, err := git.PlainOpen(cachePath)
+	targetBranch := plumbing.ReferenceName(fmt.Sprintf("refs/heads/%s", m.Branch))
+
+	repo, err := git.PlainOpenWithOptions(cachePath, &git.PlainOpenOptions{DetectDotGit: true})
 	if err != nil {
+		log.Printf("Error opening repo - %s", err)
 		return err
 	}
+
+	//Fetch to synchornize with remote
+	remote, err := repo.Remote("origin")
+	if err != nil {
+		log.Printf("Error getting remote \"origin\" - %s", err)
+		return err
+	}
+	err = remote.Fetch(&git.FetchOptions{
+		Progress: os.Stdout,
+		// RefSpecs: []config.RefSpec{"refs/*:refs/*", "HEAD:refs/heads/HEAD"},
+		RefSpecs: []config.RefSpec{"refs/*:refs/*"},
+	})
+	if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) {
+		log.Printf("Error fetching repo - %s", err)
+		return err
+	}
+
+	//Checkout
 	w, err := repo.Worktree()
 	if err != nil {
 		return err
 	}
-	err = w.Checkout(&git.CheckoutOptions{
-		Branch: plumbing.ReferenceName(fmt.Sprintf("refs/heads/%s", m.Branch)),
-	})
+	currentBranch, err := repo.Head()
 	if err != nil {
-		log.Printf("Error checking out branch: %s", err)
+		log.Printf("Error retrieving current HEAD - %s", err)
+		return err
 	}
+	if currentBranch.Name() != targetBranch {
+		err = w.Checkout(&git.CheckoutOptions{
+			Branch: targetBranch,
+		})
+		if err != nil {
+			log.Printf("Error checking out branch %s - %s", m.Branch, err)
+		}
+	}
+
+	//Pull latest updates
 	err = w.Pull(&git.PullOptions{RemoteName: "origin"})
 	if err != nil && errors.Is(err, git.NoErrAlreadyUpToDate) {
+		log.Printf("Module %s already up-to-date", cachePath)
 		err = nil //ignore already up to date "error"
+	} else if err != nil {
+		log.Printf("Error pulling repo - %s", err)
+		return err
 	}
+
+	//Checkout tag
 	if err == nil && m.Tag != "" {
 		err = m.checkoutTag(repo)
 	}

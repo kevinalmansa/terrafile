@@ -17,7 +17,7 @@ modules will be downloaded, but previously cached modules will not be removed.`,
 		if err := terraCache.Create(); err != nil {
 			log.Printf("Error installing modules: %s", err)
 		} else {
-			log.Printf("Modules successfully installed.")
+			log.Printf("Finished, please see output for details")
 		}
 	},
 }
